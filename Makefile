@@ -9,10 +9,8 @@ OBJ := $(SRC:.c=.o)
 $(NAME): $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $(NAME)
 
-%.o %.cc
+%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
-
-all:
 
 clean:
 	rm -f $(OBJ)
@@ -24,4 +22,4 @@ flean: clean
 
 re: fclean $(NAME) 
 
-.PHONY: all clean fclean re 
+.PHONY: clean fclean re 

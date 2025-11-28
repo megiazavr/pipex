@@ -7,7 +7,7 @@ int error_handler(int ac, char *av[], int *fd)
 
 	if (ac != 5)
 	{
-		printf("Too much to handle!");
+		printf("Cant hande this amount of vars!");
 		return (1);
 	}
 	fd_out = open(av[ac - 1], O_CREAT | O_WRONLY | O_TRUNC, 0664);
@@ -28,49 +28,7 @@ int error_handler(int ac, char *av[], int *fd)
 	return (0);
 }
 
-int ft_is_space(unsigned char c)
-{
-	return ((c >= 9 && c <= 13) || c == 32);
-}
-
-static void	free_arr(char **arr, int k)
-{
-	while (k > 0)
-		free(arr[--k]);
-	free(arr);
-}
-
-static t_arg ft_quote(const char *str, int i)
-{
-	t_arg	a;
-
-	a.ok = 1;
-	i++;
-	a.start = i;
-	while (str[i] && str[i] != '"')
-		i++;
-	a.end = i;
-	if (str[i] == '"')
-		i++;
-	a.next_i = i;
-	return (a);
-}
-
-static t_arg ft_word(const char *str, int i)
-{
-	t_arg	a;
-
-	a.ok = 1;
-	a.start = i;
-	while (str[i] && !ft_is_space((unsigned char)str[i]) 
-															&& str[i] != '"')
-		i++;
-	a.end = i;
-	a.next_i = i;
-	return (a);
-}
-
-t_arg	next_token(char *str, int i)
+t_arg	next_token(const char *str, int i)
 {
 	t_arg	arg;
 
@@ -89,12 +47,11 @@ t_arg	next_token(char *str, int i)
 	return (ft_word(str, i));
 }
 
-
 int count_words(const char *str)
 {
-	int	i;
-	int 		count_words;
-	t_arg args;
+	int		i;
+	int 	count_words;
+	t_arg 	args;
 
 	if (!str)
 		return 0;
@@ -120,7 +77,7 @@ char	*word(char *str, int start, int end)
 	char 	*arr;
 
 	len = end - start;
-	arr = (char **)malloc(len + 1);
+	arr = malloc(sizeof(char *) * (len + 1));
 	if (!arr)
 		return (NULL);
 	i = 0;
@@ -133,31 +90,24 @@ char	*word(char *str, int start, int end)
 	return (arr);
 }
 
-int	**allocate_memory(char *str, int i, int k, int start, int end)
+
+char	**allocate_memory(char *str)
 {
-	int	j;
+	int		words;
 	char	**arr;
-	t_arg	n;
+	int		err;
 
 	if (!str)
-		reurn (NULL);
-	j = count_words(str);
-	arr = (char**)malloc(sizeof(char**) * (j + 1));
+		return (NULL);
+	words = count_words(str);
+	arr = malloc(sizeof(char *) * (words + 1));
 	if (!arr)
 		return (NULL);
-	i = 0;
-	k = 0;
-	while (1)
+	err = fill_args(arr, str);
+	if (err >= 0)
 	{
-		n = next_token(str, i);
-		if (!n.ok)
-			break ;
-		arr[k] = word(str, n.start, n.end);
-		if (!arr[k])
-			return (free_arr(arr, k), NULL);
-		k++;
-		i = n.next_i;
+		free_arr(arr, err);
+		return (NULL);
 	}
-	arr[k] = '\0';
 	return (arr);
 }

@@ -1,15 +1,13 @@
 #include "pipex.h"
 
-int main(int ac, char *av[], char *env[])
+int main(int ac, char *av[], char *envp[])
 {
-	t_process point;
+    int     fd[2];
 
-	if (ac != 5)
-		return 1;
-	if (!env[0])
-		return (perror("Nothing created yet!"), 0);
-	if (error_handler(ac, av, point.fd) == 1)
-		return (0);
-	char cmd1 = allocate_memory(av[2]);
-	char cmd2 = allocate_memory(av[3]);
+    if (!envp || !envp[0])
+        return (perror("No env"), 1);
+    if (error_handler(ac, av, fd))
+        return (1);
+
+    return (0);
 }

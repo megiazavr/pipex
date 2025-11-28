@@ -23,11 +23,16 @@ typedef struct s_arg
     int next_i;
 }   t_arg;
 
+void	free_arr(char **arr, int k);
+
 int     error_handler(int ac, char *av[], int *fd);
 int     ft_is_space(unsigned char c);
-int	    **allocate_memory(char *str, int i, int k, int start, int end);
-t_arg	next_token(const char *str, int i);
+t_arg ft_quote(const char *str, int i);
+t_arg ft_word(const char *str, int i);
+char    **allocate_memory(char *str);
+char	*word(char *str, int start, int end);
 int     count_words(const char *str);
-char	word(char *str, int start, int end);
+t_arg	next_token(const char *str, int i);
+int     fill_args(char **arr, char *str);
 
 #endif
