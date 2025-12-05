@@ -1,25 +1,32 @@
 NAME := pipex
 CC := cc
-CFLAGS := -Wall -Werror -Wextra
+CFLAGS := -Wall -Wextra -Werror -g
 
-SRC := main.c helpers.c parsing.c
+SRC := \
+	main.c \
+	helpers.c \
+	parsing.c \
+	parsing2.c \
+	finding_path.c \
+	pipex.c \
 
 OBJ := $(SRC:.c=.o)
 
+all: $(NAME)
+
 $(NAME): $(OBJ)
-	$(CC) $(CFLAGS) $(OBJ) -o $(NAME)
+	@$(CC) $(OBJ) $(CFLAGS) -o $(NAME)
+	@echo "☼.☼ pipex compiled successfully!"
 
 %.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJ)
-	@echo "cleaned"
+	@rm -f $(OBJ)
 
-flean: clean
-	rm -rf $(OBJ)
-	@echo "clean cleaned"
+fclean: clean
+	@rm -f $(NAME)
 
-re: fclean $(NAME) 
+re: fclean all 
 
-.PHONY: clean fclean re 
+.PHONY: all clean fclean re 

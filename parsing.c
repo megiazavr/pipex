@@ -1,34 +1,47 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parsing.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: megiazar <megiazar@student.42lisboa.com    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/12/04 18:23:32 by megiazar          #+#    #+#             */
+/*   Updated: 2025/12/04 19:00:57 by megiazar         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "pipex.h"
 
-int error_handler(int ac, char *av[], int *fd)
+static t_arg	ft_quote(char *str, int i)
 {
-	int fd_in;
-	int fd_out;
+	t_arg	a;
 
-	if (ac != 5)
-	{
-		printf("Cant hande this amount of vars!");
-		return (1);
-	}
-	fd_out = open(av[ac - 1], O_CREAT | O_WRONLY | O_TRUNC, 0664);
-	if (fd_out == -1)
-	{    
-		perror("No permission to open the file outfile.txt");
-		return (1);    
-	}
-	fd_in = open(av[1], O_RDONLY);
-	if (fd_in == -1)
-	{
-		perror("I can't open a infile.txt");
-		close(fd_out);
-		return (1);
-	}
-	fd[0] = fd_in;
-	fd[1] = fd_out;
-	return (0);
+	a.ok = 1;
+	i++;
+	a.start = i;
+	while (str[i] && str[i] != '"')
+		i++;
+	a.end = i;
+	if (str[i] == '"')
+		i++;
+	a.next_i = i;
+	return (a);
 }
 
-t_arg	next_token(const char *str, int i)
+static t_arg	ft_word(char *str, int i)
+{
+	t_arg	a;
+
+	a.ok = 1;
+	a.start = i;
+	while (str[i] && !ft_is_space((unsigned char)str[i]) && str[i] != '"')
+		i++;
+	a.end = i;
+	a.next_i = i;
+	return (a);
+}
+
+t_arg	next_token(char *str, int i)
 {
 	t_arg	arg;
 
@@ -47,67 +60,45 @@ t_arg	next_token(const char *str, int i)
 	return (ft_word(str, i));
 }
 
-int count_words(const char *str)
+int	count_words(char *str)
 {
 	int		i;
-	int 	count_words;
-	t_arg 	args;
+	int		count;
+	t_arg	token;
 
 	if (!str)
-		return 0;
-	count_words = 0;
+		return (0);
+	count = 0;
 	i = 0;
 	while (str[i] && ft_is_space((unsigned char)str[i]))
 		i++;
 	while (1)
 	{
-		args = next_token(str, i);
-		if (!args.ok)
+		token = next_token(str, i);
+		if (!token.ok)
 			break ;
-		count_words++;
-		i = args.next_i;
+		count++;
+		i = token.next_i;
 	}
-	return (count_words);
+	return (count);
 }
 
 char	*word(char *str, int start, int end)
 {
-	int 	i;
-	int 	len;
-	char 	*arr;
+	int		len;
+	int		i;
+	char	*res;
 
 	len = end - start;
-	arr = malloc(sizeof(char *) * (len + 1));
-	if (!arr)
+	res = (char *)malloc((len + 1) * sizeof(char));
+	if (!res)
 		return (NULL);
 	i = 0;
-	while (start < end)
+	while (i < len)
 	{
-		arr[i] = str[i];
+		res[i] = str[start + i];
 		i++;
 	}
-	arr[i] = '\0';
-	return (arr);
-}
-
-
-char	**allocate_memory(char *str)
-{
-	int		words;
-	char	**arr;
-	int		err;
-
-	if (!str)
-		return (NULL);
-	words = count_words(str);
-	arr = malloc(sizeof(char *) * (words + 1));
-	if (!arr)
-		return (NULL);
-	err = fill_args(arr, str);
-	if (err >= 0)
-	{
-		free_arr(arr, err);
-		return (NULL);
-	}
-	return (arr);
+	res[i] = '\0';
+	return (res);
 }
